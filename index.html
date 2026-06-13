@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jordan Daniels — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --grid: rgba(255,255,255,0.03);
+    --text: #f5f5f5;
+    --text-muted: rgba(255,255,255,0.5);
+    --text-faint: rgba(255,255,255,0.35);
+    --border: rgba(255,255,255,0.08);
+    --purple: #c861ff;
+    --blue: #5b8cff;
+    --grad: linear-gradient(90deg, var(--purple), var(--blue));
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: -0.01em; }
+
+  .rotating-text {
+    display: inline-block;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .rotating-text.fade-out {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* Glow blobs */
+  .glow-blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-1 { top: -200px; left: 10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(200,97,255,0.18), transparent 70%); }
+  .glow-2 { top: 30%; right: 5%; width: 450px; height: 450px; background: radial-gradient(circle, rgba(91,140,255,0.14), transparent 70%); }
+
+  /* Nav */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+    background: rgba(10,10,12,0.6);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .nav-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .logo { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; }
+  .nav-tabs {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-tabs a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+  .nav-tabs a:hover, .nav-tabs a.active {
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .menu-toggle { display: none; background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 110px 24px 80px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(157,123,255,0.08);
+    border: 0.5px solid rgba(200,97,255,0.25);
+    color: #d9b8ff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 28px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeUp 0.6s ease forwards;
+    animation-delay: 0.05s;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #c861ff;
+    box-shadow: 0 0 8px #c861ff;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 58px);
+    line-height: 1.15;
+    margin-bottom: 20px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: fadeUp 0.6s ease forwards;
+    animation-delay: 0.15s;
+  }
+  .hero p {
+    color: var(--text-muted);
+    font-size: 17px;
+    max-width: 480px;
+    margin: 0 auto 36px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: fadeUp 0.6s ease forwards;
+    animation-delay: 0.3s;
+  }
+  .hero-ctas {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: fadeUp 0.6s ease forwards;
+    animation-delay: 0.45s;
+  }
+  .btn {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 28px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.15s, box-shadow 0.2s, border-color 0.2s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: var(--grad);
+    color: #0a0a0c;
+    border: none;
+    box-shadow: 0 0 28px rgba(157,123,255,0.3);
+  }
+  .btn-primary:hover { box-shadow: 0 0 40px rgba(157,123,255,0.5); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 0.5px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.25); }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Marquee */
+  .marquee-wrap {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    border-top: 0.5px solid var(--border);
+    border-bottom: 0.5px solid var(--border);
+    padding: 14px 0;
+  }
+  .marquee-wrap.fast { border-top: none; }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+  }
+  .marquee-set {
+    display: flex;
+    gap: 32px;
+    padding-right: 32px;
+    white-space: nowrap;
+  }
+  .marquee-track.slow { animation: scrollLeft 32s linear infinite; }
+  .marquee-track.fast { animation: scrollLeft 9s linear infinite; }
+  @keyframes scrollLeft {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .tag {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    padding: 7px 18px;
+    border: 0.5px solid var(--border);
+    border-radius: 999px;
+  }
+  .tag.accent {
+    background: linear-gradient(90deg, rgba(200,97,255,0.12), rgba(91,140,255,0.12));
+    border-color: rgba(200,97,255,0.25);
+    color: #dcb8ff;
+  }
+
+  /* Section headings */
+  section { position: relative; z-index: 1; padding: 90px 0; }
+  .section-head { text-align: center; margin-bottom: 48px; }
+  .section-head .eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 10px;
+  }
+  .section-head h2 { font-size: clamp(28px, 4vw, 38px); }
+  .section-head p { color: var(--text-muted); margin-top: 12px; font-size: 15px; }
+
+  /* Bento grid */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+  }
+  .bento {
+    background: rgba(255,255,255,0.025);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .bento.in-view {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .bento:hover {
+    border-color: rgba(200,97,255,0.4);
+    box-shadow: 0 8px 36px rgba(150,80,255,0.16);
+    transform: translateY(-4px);
+  }
+  .bento.span-4 { grid-column: span 4; }
+  .bento.span-3 { grid-column: span 3; }
+  .bento.span-2 { grid-column: span 2; }
+  .bento.span-6 { grid-column: span 6; }
+
+  .icon-box {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, rgba(200,97,255,0.16), rgba(91,140,255,0.16));
+    margin-bottom: 18px;
+    font-size: 20px;
+  }
+  .bento h3 { font-size: 17px; margin-bottom: 8px; }
+  .bento p { color: var(--text-muted); font-size: 14px; }
+  .bento .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .bento .tags span {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 0.5px solid var(--border);
+    color: var(--text-faint);
+  }
+
+  /* Contact form */
+  .contact-card {
+    background: rgba(255,255,255,0.025);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+  .field input, .field textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  .field input:focus, .field textarea:focus {
+    outline: none;
+    border-color: rgba(200,97,255,0.5);
+  }
+  .field textarea { resize: vertical; min-height: 110px; }
+
+  /* Donate */
+  .donate-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* License */
+  .license-box {
+    max-width: 700px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.025);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .license-box pre {
+    white-space: pre-wrap;
+    font-family: 'Space Grotesk', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  footer {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 40px 24px;
+    border-top: 0.5px solid var(--border);
+    color: var(--text-faint);
+    font-size: 13px;
+  }
+
+  @media (max-width: 768px) {
+    .nav-tabs { display: none; }
+    .menu-toggle { display: block; }
+    .bento.span-4, .bento.span-3, .bento.span-2 { grid-column: span 6; }
+    .donate-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, .bento, .badge, .hero h1, .hero p, .hero-ctas, .marquee-track {
+      animation: none !important;
+      transition: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-blob glow-1"></div>
+<div class="glow-blob glow-2"></div>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">saviorsmile</div>
+    <ul class="nav-tabs">
+      <li><a href="#home" class="active">Home</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="#license">License</a></li>
+      <li><a href="#donate">Donate</a></li>
+    </ul>
+    <button class="menu-toggle" aria-label="Menu">&#9776;</button>
+  </div>
+</nav>
+
+<header class="hero" id="home">
+  <div class="badge"><span class="dot"></span> Available for work</div>
+  <h1>Crafting <span class="gradient-text rotating-text" id="rotating-text">digital experiences</span><br>that feel alive</h1>
+  <p>I'm a frontend developer who builds clean, fast, and thoughtfully animated interfaces — from landing pages to full web apps.</p>
+  <div class="hero-ctas">
+    <a href="#projects" class="btn btn-primary">View work</a>
+    <a href="#contact" class="btn btn-secondary">Get in touch</a>
+  </div>
+</header>
+
+<div class="marquee-wrap">
+  <div class="marquee-track slow" id="marquee-slow">
+    <span class="marquee-set">
+      <span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">Node.js</span><span class="tag">Next.js</span><span class="tag">Tailwind CSS</span><span class="tag">Figma</span><span class="tag">GraphQL</span><span class="tag">MongoDB</span>
+    </span>
+  </div>
+</div>
+<div class="marquee-wrap fast">
+  <div class="marquee-track fast" id="marquee-fast">
+    <span class="marquee-set">
+      <span class="tag accent">UI / UX design</span><span class="tag accent">Motion design</span><span class="tag accent">API integration</span><span class="tag accent">Performance tuning</span><span class="tag accent">Design systems</span>
+    </span>
+  </div>
+</div>
+
+<section id="projects">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Selected work</div>
+      <h2>Recent <span class="gradient-text">projects</span></h2>
+      <p>A few things I've built recently</p>
+    </div>
+    <div class="bento-grid">
+      <div class="bento span-4">
+        <div class="icon-box">&#128187;</div>
+        <h3>Project one</h3>
+        <p>A full-stack web app with a clean animated UI, built with React, Node, and a custom API layer.</p>
+        <div class="tags"><span>React</span><span>Node.js</span><span>PostgreSQL</span></div>
+      </div>
+      <div class="bento span-2">
+        <div class="icon-box">&#127912;</div>
+        <h3>Design system</h3>
+        <p>A component library and design tokens used across multiple products.</p>
+        <div class="tags"><span>Figma</span><span>Storybook</span></div>
+      </div>
+      <div class="bento span-2">
+        <div class="icon-box">&#9889;</div>
+        <h3>Performance audit</h3>
+        <p>Cut load time by 60% for a client's marketing site through bundle and asset optimization.</p>
+        <div class="tags"><span>Lighthouse</span><span>Vite</span></div>
+      </div>
+      <div class="bento span-2">
+        <div class="icon-box">&#128241;</div>
+        <h3>Mobile dashboard</h3>
+        <p>A responsive analytics dashboard with live data and smooth chart transitions.</p>
+        <div class="tags"><span>Next.js</span><span>Recharts</span></div>
+      </div>
+      <div class="bento span-2">
+        <div class="icon-box">&#127760;</div>
+        <h3>Marketing site</h3>
+        <p>An animated landing page with scroll-triggered reveals for a startup launch.</p>
+        <div class="tags"><span>GSAP</span><span>Astro</span></div>
+      </div>
+    </div>
+    <p style="text-align:center; color:var(--text-faint); font-size:13px; margin-top:32px;">
+      All projects above are licensed under the same terms — see <a href="#license" style="color:var(--purple); text-decoration:none;">License</a>.
+    </p>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Get in touch</div>
+      <h2>Let's work <span class="gradient-text">together</span></h2>
+      <p>Have a project in mind? Send a message below.</p>
+    </div>
+    <div class="contact-card">
+      <form id="contact-form">
+        <div class="field">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; border:none; cursor:pointer;">Send message</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="license">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Usage</div>
+      <h2>License</h2>
+      <p>Terms for using this site's code</p>
+    </div>
+    <div class="license-box">
+      <p style="margin-bottom: 16px;">Each project is licensed individually under the following default terms, unless stated otherwise for that specific project:</p>
+      <p style="margin-bottom: 16px;">Only a person who has paid for a project may use it. Others may use it only with explicit permission from the owner, or if the owner has marked that project as public for everyone to use.</p>
+      <p>To request permission, check a project's status, or purchase a license, contact me via the form above.</p>
+    </div>
+  </div>
+</section>
+
+<section id="donate">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Support</div>
+      <h2>Buy me a <span class="gradient-text">coffee</span></h2>
+      <p>If you like my work, consider supporting it</p>
+    </div>
+    <div class="donate-grid">
+      <div class="bento span-2" style="text-align:center;">
+        <div class="icon-box" style="margin:0 auto 18px;">&#9749;</div>
+        <h3>Ko-fi</h3>
+        <p>One-time support</p>
+      </div>
+      <div class="bento span-2" style="text-align:center;">
+        <div class="icon-box" style="margin:0 auto 18px;">&#128181;</div>
+        <h3>GitHub Sponsors</h3>
+        <p>Monthly support</p>
+      </div>
+      <div class="bento span-2" style="text-align:center;">
+        <div class="icon-box" style="margin:0 auto 18px;">&#9740;</div>
+        <h3>PayPal</h3>
+        <p>Direct donation</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  &copy; 2026 Jordan Daniels. Built with care.
+</footer>
+
+<script>
+  // Rotating hero text
+  const rotatingPhrases = ['digital experiences', 'modern interfaces', 'fast websites', 'animated UIs'];
+  let phraseIndex = 0;
+  const rotatingEl = document.getElementById('rotating-text');
+
+  setInterval(() => {
+    rotatingEl.classList.add('fade-out');
+    setTimeout(() => {
+      phraseIndex = (phraseIndex + 1) % rotatingPhrases.length;
+      rotatingEl.textContent = rotatingPhrases[phraseIndex];
+      rotatingEl.classList.remove('fade-out');
+    }, 400);
+  }, 2800);
+
+  // Duplicate marquee sets for a seamless loop
+  document.querySelectorAll('.marquee-track').forEach(track => {
+    track.innerHTML += track.innerHTML;
+  });
+
+  // Active nav link on scroll
+  const sections = document.querySelectorAll('section, header');
+  const navLinks = document.querySelectorAll('.nav-tabs a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+      const top = sec.offsetTop - 100;
+      if (window.scrollY >= top) current = sec.id;
+    });
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  });
+
+  // Bento cards reveal on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.bento').forEach((el, i) => {
+    el.style.transitionDelay = (i % 3) * 0.08 + 's';
+    observer.observe(el);
+  });
+
+  // Contact form -> Discord webhook
+  // Replace WEBHOOK_URL with your Discord channel webhook URL
+  const WEBHOOK_URL = 'https://discord.com/api/webhooks/1515390300846297171/23SEqReV20HPQvUiIgp6WubzNk3jNCC-uufjL0vU7aXHrs0aYVGfKe9h2Cj1wtXYps6J';
+
+  document.getElementById('contact-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const name = form.name.value;
+    const email = form.email.value;
+    const message = form.message.value;
+
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          embeds: [{
+            title: 'New portfolio message',
+            color: 0xc861ff,
+            fields: [
+              { name: 'Name', value: name, inline: true },
+              { name: 'Email', value: email, inline: true },
+              { name: 'Message', value: message }
+            ],
+            timestamp: new Date().toISOString()
+          }]
+        })
+      });
+
+      if (res.ok) {
+        submitBtn.textContent = 'Sent!';
+        form.reset();
+      } else {
+        submitBtn.textContent = 'Error — try again';
+      }
+    } catch (err) {
+      submitBtn.textContent = 'Error — try again';
+    }
+
+    setTimeout(() => {
+      submitBtn.textContent = 'Send message';
+      submitBtn.disabled = false;
+    }, 3000);
+  });
+</script>
+
+</body>
+</html>
