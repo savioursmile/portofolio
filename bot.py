@@ -45,15 +45,15 @@ def _role_ids(key: str) -> list[str]:
 STAFF_ROLE_IDS = _role_ids("STAFF_ROLE_ID")
 ADMIN_ROLE_IDS = _role_ids("ADMIN_ROLE_ID")
 
-# ── Colors ────────────────────────────────────────────────────────────────────
+# ── Colors (kept for logic references only; no accent_color on containers) ────
 
 class C:
-    info     = 0x5865F2
-    success  = 0x57F287
-    error    = 0xED4245
-    warning  = 0xFEE75C
-    review   = 0xF5A623
-    neutral  = 0x2C2F33
+    info    = None
+    success = None
+    error   = None
+    warning = None
+    review  = None
+    neutral = None
 
 # ── Database ──────────────────────────────────────────────────────────────────
 
@@ -131,7 +131,7 @@ def _footer(extra: str | None = None) -> str:
 
 def make_container(
     *,
-    color: int = C.neutral,
+    color: int = None,   # ignored — no accent_color / side stripe
     author: str | None = None,
     title: str | None = None,
     description: str | None = None,
@@ -140,7 +140,7 @@ def make_container(
     show_footer: bool = True,
 ) -> ui.Container:
     """
-    Build a Components V2 Container.
+    Build a clean Components V2 Container (no accent colour / side stripe).
     fields = list of (name, value, inline)
     """
     parts: list[ui.Item] = []
@@ -178,7 +178,7 @@ def make_container(
             field_lines.append("\u2003\u2003".join(row_buf))
         parts.append(ui.TextDisplay("\n\n".join(field_lines)))
 
-    # Footer
+    # Footer — separated by a visible rule
     if show_footer or footer:
         if parts:
             parts.append(_sep(divider=True))
@@ -187,7 +187,7 @@ def make_container(
     if not parts:
         parts.append(ui.TextDisplay("\u200b"))
 
-    return ui.Container(*parts, accent_color=color)
+    return ui.Container(*parts)  # no accent_color — clean look
 
 
 def v2_view(*items: ui.Item, timeout: float | None = None) -> ui.LayoutView:
@@ -1027,7 +1027,7 @@ async def review_list(interaction: discord.Interaction, page: int = 1):
     items: list[ui.Item] = []
 
     header = ui.TextDisplay(f"### 📋 Reviews — Page {page}/{pages}\n-# Showing {len(reviews)} of {total}")
-    items.append(ui.Container(header, accent_color=C.info))
+    items.append(ui.Container(header))
 
     for r in reviews:
         parts = [
@@ -1040,7 +1040,7 @@ async def review_list(interaction: discord.Interaction, page: int = 1):
             _sep(divider=True),
             ui.TextDisplay(f"-# {interaction.guild.name} • Review ID: {r['id']}"),
         ]
-        items.append(ui.Container(*parts, accent_color=C.review))
+        items.append(ui.Container(*parts))
 
     await send_v2(interaction, *items)
 
