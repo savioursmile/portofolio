@@ -25,7 +25,7 @@ import uuid
 import requests
 from datetime import datetime
 from functools import wraps
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request, abort, send_from_directory
 
 app = Flask(__name__)
 
@@ -95,7 +95,6 @@ def cors(response):
     response.headers["Access-Control-Allow-Methods"] = "GET,POST,PATCH,DELETE,OPTIONS"
     return response
 
-@app.route("/", defaults={"path": ""}, methods=["OPTIONS"])
 @app.route("/<path:path>", methods=["OPTIONS"])
 def options(_path):
     return "", 204
